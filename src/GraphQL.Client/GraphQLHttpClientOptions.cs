@@ -12,9 +12,14 @@ namespace GraphQL.Client.Http
     public class GraphQLHttpClientOptions
     {
         /// <summary>
-        /// The GraphQL EndPoint to be used
+        /// The GraphQL EndPoint to be used for HTTP connections
         /// </summary>
         public Uri EndPoint { get; set; }
+
+        /// <summary>
+        /// The GraphQL EndPoint to be used for WebSocket connection
+        /// </summary>
+        public Uri WebSocketEndPoint { get; set; }
 
         /// <summary>
         /// The <see cref="System.Net.Http.HttpMessageHandler"/> that is going to be used
@@ -46,6 +51,11 @@ namespace GraphQL.Client.Http
         /// </summary>
         public Func<GraphQLRequest, GraphQLHttpClient, Task<GraphQLHttpRequest>> PreprocessRequest { get; set; } = (request, client) =>
             Task.FromResult(request is GraphQLHttpRequest graphQLHttpRequest ? graphQLHttpRequest : new GraphQLHttpRequest(request));
+
+        /// <summary>
+        /// Subscription request preprocessing function. Can be used i.e. to inject authorization info into a GraphQL subscription request payload.
+        /// </summary>
+        public Func<GraphQLRequest, GraphQLHttpClient, Task<GraphQLHttpRequest>> PreprocessSubscriptionRequest { get; set; }
 
         /// <summary>
         /// This callback is called after successfully establishing a websocket connection but before any regular request is made. 

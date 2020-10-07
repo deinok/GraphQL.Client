@@ -98,12 +98,11 @@ namespace GraphQL.Client.Http.Websocket
                     Observable.Create<GraphQLResponse<TResponse>>(async observer =>
                     {
                         Debug.WriteLine($"Create observable thread id: {Thread.CurrentThread.ManagedThreadId}");
-                        await _client.Options.PreprocessRequest(request, _client);
                         var startRequest = new GraphQLWebSocketRequest
                         {
                             Id = Guid.NewGuid().ToString("N"),
                             Type = GraphQLWebSocketMessageType.GQL_START,
-                            Payload = request
+                            Payload = await (_client.Options.PreprocessSubscriptionRequest?.Invoke(request, _client) ?? _client.Options.PreprocessRequest(request, _client))
                         };
                         var closeRequest = new GraphQLWebSocketRequest
                         {
@@ -198,6 +197,8 @@ namespace GraphQL.Client.Http.Websocket
                             Debug.WriteLine(e);
                             throw;
                         }
+
+                        // TODO: wait for "connection_ack" response
 
                         Debug.WriteLine($"sending initial message on subscription {startRequest.Id}");
                         // send subscription request
